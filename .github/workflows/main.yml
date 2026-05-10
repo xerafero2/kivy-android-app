@@ -1,24 +1,44 @@
 name: Build Android APK
+
+# Workflow akan berjalan ketika ada push ke branch main
 on:
-  workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
+  # Bisa juga dijalankan secara manual dari tab Actions
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1.6.1
-        with:
-          command: buildozer android debug
-          buildozer_version: master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: package
-          path: bin/*.apk
-          
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libltdl-dev libffi-dev libssl-dev python3-dev
+        sudo apt-get install -y zlib1g-dev zip unzip autoconf libtool pkg-config
+        sudo apt-get install -y openjdk-17-jdk
+
+    - name: Install Buildozer & Cython
+      run: |
+        pip install --upgrade pip
+        pip install buildozer cython virtualenv
+
+    - name: Build APK with Buildozer
+      # Accept license secara otomatis dan build APK mode debug
+      run: |
+        yes | buildozer android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: Kalkulator-APK
+        path: bin/*.apk
