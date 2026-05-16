@@ -1,10 +1,8 @@
-name: Build Android APK
+name: Build Pro Session Browser APK
 
-# Workflow akan berjalan ketika ada push ke branch main
 on:
   push:
     branches: [ main ]
-  # Bisa juga dijalankan secara manual dari tab Actions
   workflow_dispatch:
 
 jobs:
@@ -33,12 +31,11 @@ jobs:
         pip install buildozer cython virtualenv
 
     - name: Build APK with Buildozer
-      # Accept license secara otomatis dan build APK mode debug
       run: |
         yes | buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: Kalkulator-APK
+        name: ProSessionBrowser-APK
         path: bin/*.apk
